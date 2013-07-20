@@ -21,19 +21,24 @@ var api_key = "";
 var username = "";
 var _token = "";
 
-app.get('/',function(req, res){
-  //Fetch elements from Storify API
-  superagent.get("http://api.storify.com/v1/stories/" + user + "/" + story_slug)
-    .query({api_key: api_key,
-      username: username,
-      _token: _token})
-    .set({  Accept: 'application/json' })
-    .end(function(e, storifyResponse){
-      if (e) next(e);
-      //Render template with story object in response body     
-      return res.render('index',storifyResponse.body.content);      
-    })
+app.get('/', function(req, res, next) {
+    console.log("here we are the middleware ");
+    next();
+  },
+  function(req, res) {
+    //Fetch elements from server
+    superagent.get("http://app1-by-herry.herokuapp.com/messages/list.json")
+      .set({
+        Accept: 'text/html'
+      })
+      .end(function(e, messages) {
+        console.dir(JSON.parse(messages.text));
+        if (e) next(e);
+        //res.end("OK");
+        //Render template with story object in response body     
+        return res.render('msgs', {elements: JSON.parse(messages.text)});
+      })
+  });
 
-})
 
 app.listen(3001);
